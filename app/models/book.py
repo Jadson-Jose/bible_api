@@ -7,5 +7,5 @@ class Book(Base):
     __tablename__ = "books"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     abbreviation = Column(String, nullable=False)

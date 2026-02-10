@@ -22,16 +22,25 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture(scope="function")
 def db_session():
+    """Cria uma sessão de banco para cada teste e limpa após o teste"""
+    print("\n🔧 Criando tabelas...")
+    # Recria as tabelas do zero (garante que está limpo)
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    print("✅ Tabelas criadas!")
 
+    # Cria sessão
     session = TestingSessionLocal()
 
     yield session
 
+    print("🧹 Limpando após o teste...")
+    # Limpa após o teste
     session.close()
 
+    # Drop e recria para garantir limpeza total
     Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+    print("✅ Limpeza concluída!")
 
 
 @pytest.fixture(scope="function")

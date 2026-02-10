@@ -1,0 +1,91 @@
+{% extends "base.html" %} {% block title %}Gerenciar Livros - Bible API{%
+endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <h2>📚 Livros Cadastrados</h2>
+
+    {% if books %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-primary">
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Abreviação</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for book in books %}
+          <tr>
+            <td>{{ book.id }}</td>
+            <td>{{ book.name }}</td>
+            <td>{{ book.abbreviation }}</td>
+            <td>
+              <button class="btn btn-sm btn-warning">Editar</button>
+              <form
+                method="POST"
+                action="/admin/books/delete/{{ book.id }}"
+                style="display: inline"
+                onsubmit="return confirm('Tem certeza que deseja excluir {{ book.name }}?');"
+              >
+                <button type="submit" class="btn btn-sm btn-danger">
+                  Excluir
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+      <i>Nenhum livro cadastrado ainda. Adicione o primeiro!</i>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <h2>➕ Adicionar Novo Livro</h2>
+
+    {% if message %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/admin/books/create">
+      <div class="mb-3">
+        <label for="name" class="form-label">Nome do Livro</label>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          name="name"
+          placeholder="Ex: Gênesis"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="abbreviation" class="form-label">Abreviação</label>
+        <input
+          type="text"
+          class="form-control"
+          id="abbreviation"
+          name="abbreviation"
+          placeholder="Ex: Gn"
+          required
+          maxlength="5"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">
+        Adicionar Livro
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
