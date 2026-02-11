@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Livro - Bible API{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>✏️ Editar Livro</h2>
+        
+        <form method="POST" action="/admin/books/update/{{ book.id }}">
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome do Livro</label>
+                <input type="text" class="form-control" id="name" name="name" 
+                       value="{{ book.name }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="abbreviation" class="form-label">Abreviação</label>
+                <input type="text" class="form-control" id="abbreviation" name="abbreviation" 
+                       value="{{ book.abbreviation }}" required maxlength="5">
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                <a href="/admin/books" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

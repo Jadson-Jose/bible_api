@@ -22,7 +22,11 @@ endblock %} {% block content %}
             <td>{{ book.name }}</td>
             <td>{{ book.abbreviation }}</td>
             <td>
-              <button class="btn btn-sm btn-warning">Editar</button>
+              <a
+                href="/admin/books/edit/{{ book.id }}"
+                class="btn btn-sm btn-warning"
+                >Editar</a
+              >
               <form
                 method="POST"
                 action="/admin/books/delete/{{ book.id }}"
