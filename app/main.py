@@ -6,7 +6,15 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.book import Book
 from app.models.chapter import Chapter
-from app.schemas import BookCreate, BookResponse, ChapterCreate, ChapterResponse
+from app.models.verse import Verse
+from app.schemas import (
+    BookCreate,
+    BookResponse,
+    ChapterCreate,
+    ChapterResponse,
+    VerseCreate,
+    Verseresponse,
+)
 
 app = FastAPI(title="Bible API", version="1.0.0")
 
@@ -208,3 +216,20 @@ def delete_chapter_form(book_id: int, chapter_id: int, db: Session = Depends(get
         db.delete(chapter)
         db.commit()
     return RedirectResponse(url=f"/admin/books/{book_id}/chapters", status_code=303)
+
+
+@app.post("/verses", status_code=status.HTTP_201_CREATED, response_model=Verseresponse)
+def create_verse(verse: VerseCreate, db: Session = Depends(get_db)):
+    # Verifica se o capítulo existe
+    chapter = db.query(Chapter).filter(Chapter.id == verse.chapter_id).first()
+    if not chapter:
+        raise HTTPException(status_code=404, detail="Capítulo não encontrado")
+
+    # Cria o versículo
+    db_verse = Verse(number=verse.number, text=verse.text, chapter_id=verse.chapter_id)
+
+    db.add(db_verse)
+    db.commit()
+    db.refresh(db_verse)
+
+    return db_verse

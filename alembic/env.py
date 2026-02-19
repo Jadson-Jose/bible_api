@@ -17,6 +17,7 @@ load_dotenv()
 from app.database import Base
 from app.models.book import Book
 from app.models.chapter import Chapter
+from app.models.verse import Verse
 
 # this is the Alembic Config object
 config = context.config
