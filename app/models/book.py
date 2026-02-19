@@ -9,3 +9,5 @@ class Book(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
     abbreviation = Column(String, nullable=False)
+
+    # chapters = relationship("chapter", back_populates="book")

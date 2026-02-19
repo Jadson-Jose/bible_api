@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.book import Book
-from app.schemas import BookCreate, BookResponse
+from app.models.chapter import Chapter
+from app.schemas import BookCreate, BookResponse, ChapterCreate, ChapterResponse
 
 app = FastAPI(title="Bible API", version="1.0.0")
 
@@ -133,3 +134,77 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
     db.refresh(db_book)
 
     return db_book
+
+
+@app.post(
+    "/chapters", status_code=status.HTTP_201_CREATED, response_model=ChapterResponse
+)
+def create_chapter(chapter: ChapterCreate, db: Session = Depends(get_db)):
+    # Verifica se o livro existe
+    book = db.query(Book).filter(Book.id == chapter.book_id).first()  # ← CORRIGIDO
+    if not book:
+        raise HTTPException(status_code=404, detail="Livro não encontrado")
+
+    # Cria o capítulo
+    db_chapter = Chapter(number=chapter.number, book_id=chapter.book_id)  # ← CORRIGIDO
+
+    db.add(db_chapter)
+    db.commit()
+    db.refresh(db_chapter)
+
+    return db_chapter
+
+
+# Rota para exibir página de capítulos de um livro
+@app.get("/admin/books/{book_id}/chapters", response_class=HTMLResponse)
+def admin_chapter_page(book_id: int, request: Request, db: Session = Depends(get_db)):
+    book = db.query(Book).filter(Book.id == book_id).first()
+
+    if not book:
+        raise HTTPException(status_code=404, detail="Livro não encontrado")
+
+    chapters = (
+        db.query(Chapter)
+        .filter(Chapter.book_id == book_id)
+        .order_by(Chapter.number)
+        .all()
+    )
+
+    return templates.TemplateResponse(
+        "chapter.html",
+        {
+            "request": request,
+            "book": book,
+            "chapters": chapters,
+        },
+    )
+
+
+# Rota para criar capítulo via formulário
+@app.post("/admin/book/{book_id}/chapters/create")
+def create_chapter_form(
+    book_id: int, number: int = Form(...), db: Session = Depends(get_db)
+):
+
+    # Verifica se o livro existe
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Livro não encontrado")
+
+    # Criar o capítulo
+    chapter = Chapter(number=number, book_id=book_id)
+    db.add(chapter)
+    db.commit()
+
+    return RedirectResponse(url=f"/admin/books/{book - id}/chapters", status_code=303)
+
+
+# Rota para deletar capítulo via formulário
+@app.post("/admin/books/{book_id}/chapters/delete/{chapter_id}")
+def delete_chapter_form(book_id: int, chapter_id: int, db: Session = Depends(get_db)):
+    chapter = db.query(Chapter).filter(Chapter.id == chapter_id).first()
+
+    if chapter:
+        db.delete(chapter)
+        db.commit()
+    return RedirectResponse(url=f"/admin/books/{book_id}/chapters", status_code=303)

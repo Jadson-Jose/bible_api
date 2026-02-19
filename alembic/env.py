@@ -16,6 +16,7 @@ load_dotenv()
 # Importa o Base e os models
 from app.database import Base
 from app.models.book import Book
+from app.models.chapter import Chapter
 
 # this is the Alembic Config object
 config = context.config
