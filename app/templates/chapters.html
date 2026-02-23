@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Capítulos - {{ book.name }} - Bible API{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <a href="/admin/books" class="btn btn-secondary">← Voltar para Livros</a>
+    </div>
+    
+    <div class="col-md-8">
+        <h2>📖 Capítulos de {{ book.name }}</h2>
+        
+        {% if chapters %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Número</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chapter in chapters %}
+                        <tr>
+                            <td>Capítulo {{ chapter.number }}</td>
+                            <td>
+                                <a href="/admin/books/{{ book.id }}/chapters/{{ chapter.id }}/verses" 
+                                   class="btn btn-sm btn-info">Versículos</a>
+                                <form method="POST" action="/admin/books/{{ book.id }}/chapters/delete/{{ chapter.id }}"
+                                      style="display: inline;"
+                                      onsubmit="return confirm('Tem certeza que deseja excluir o Capítulo {{ chapter.number }}?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Nenhum capítulo cadastrado ainda. Adicione o primeiro!
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <h2>➕ Adicionar Capítulo</h2>
+        
+        <form method="POST" action="/admin/books/{{ book.id }}/chapters/create">
+            <div class="mb-3">
+                <label for="number" class="form-label">Número do Capítulo</label>
+                <input type="number" class="form-control" id="number" name="number" 
+                       placeholder="Ex: 1" required min="1">
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100">
+                Adicionar Capítulo
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

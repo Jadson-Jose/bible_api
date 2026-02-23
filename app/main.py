@@ -179,7 +179,7 @@ def admin_chapter_page(book_id: int, request: Request, db: Session = Depends(get
     )
 
     return templates.TemplateResponse(
-        "chapter.html",
+        "chapters.html",
         {
             "request": request,
             "book": book,
@@ -189,22 +189,21 @@ def admin_chapter_page(book_id: int, request: Request, db: Session = Depends(get
 
 
 # Rota para criar capítulo via formulário
-@app.post("/admin/book/{book_id}/chapters/create")
+@app.post("/admin/books/{book_id}/chapters/create")
 def create_chapter_form(
     book_id: int, number: int = Form(...), db: Session = Depends(get_db)
 ):
-
     # Verifica se o livro existe
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Livro não encontrado")
 
-    # Criar o capítulo
+    # Cria o capítulo
     chapter = Chapter(number=number, book_id=book_id)
     db.add(chapter)
     db.commit()
 
-    return RedirectResponse(url=f"/admin/books/{book - id}/chapters", status_code=303)
+    return RedirectResponse(url=f"/admin/books/{book_id}/chapters", status_code=303)
 
 
 # Rota para deletar capítulo via formulário
@@ -233,3 +232,72 @@ def create_verse(verse: VerseCreate, db: Session = Depends(get_db)):
     db.refresh(db_verse)
 
     return db_verse
+
+
+# Rota para exibir página de versículos de um capítulo
+@app.get(
+    "/admin/books/{book_id}/chapters/{chapter_id}/verses", response_class=HTMLResponse
+)
+def admin_verses_page(
+    book_id: int, chapter_id: int, request: Request, db: Session = Depends(get_db)
+):
+    book = db.query(Book).filter(Book.id == book_id).first()
+    chapter = db.query(Chapter).filter(Chapter.id == chapter_id).first()
+
+    if not book or not chapter:
+        raise HTTPException(status_code=404, detail="Livro ou capítulo não encontrado")
+
+    verses = (
+        db.query(Verse)
+        .filter(Verse.chapter_id == chapter_id)
+        .order_by(Verse.number)
+        .all()
+    )
+
+    return templates.TemplateResponse(
+        "verses.html",
+        {"request": request, "book": book, "chapter": chapter, "verses": verses},
+    )
+
+
+# Rota para criar versiculos via formulaŕio
+@app.post("/admin/books/{book_id}/chapters/{chapter_id}/verses/create")
+def create_verse_form(
+    book_id: int,
+    chapter_id: int,
+    number: int = Form(...),
+    text: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    # Verifica se o capítulo existe
+    chapter = db.query(Chapter).filter(Chapter.id == chapter_id).first()
+
+    if not chapter:
+        HTTPException(status_code=404, detail="Capíulo não encontrado")
+
+    # Cria o versículo
+    verse = Verse(number=number, text=text, chapter_id=chapter_id)
+    db.add(verse)
+    db.commit()
+
+    return RedirectResponse(
+        url=f"/admin/books/{book_id}/chapters/{chapter_id}/verses",
+        status_code=303,
+    )
+
+
+# Rota para deletar versículo via formulário
+@app.post("/admin/books/{book_id}/chapters/{chapters_id}/verses/delete/{verse_id}")
+def delete_verse_form(
+    book_id: int, chapter_id: int, verse_id: int, db: Session = Depends(get_db)
+):
+    verse = db.query(Verse).filter(Verse.id == verse_id).first()
+
+    if verse:
+        db.delete(verse)
+        db.commit()
+
+    return RedirectResponse(
+        url=f"/admin/books/{book_id}/chapters/{chapter_id}/verses",
+        status_code=303,
+    )
