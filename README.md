@@ -264,16 +264,6 @@ O projeto foi desenvolvido seguindo rigorosamente a metodologia TDD:
 - Sanitização de inputs
 - Constraints de integridade referencial no banco
 
-## 🚧 Próximas Funcionalidades
-
-- [ ] Endpoints GET para listagem e busca
-- [ ] Sistema de busca por texto em versículos
-- [ ] Paginação de resultados
-- [ ] Autenticação e autorização
-- [ ] API de busca avançada
-- [ ] Cache de consultas frequentes
-- [ ] Frontend moderno (Vue.js/React)
-
 ## 👨‍💻 Autor
 
 **Jadson Silva**  
