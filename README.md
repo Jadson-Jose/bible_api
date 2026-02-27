@@ -128,20 +128,26 @@ A API estará disponível em `http://localhost:8000`
 
 ```http
 POST   /books              # Criar livro
+GET    /books              # Listar todos os livros
+GET    /books/{id}         # Buscar livro por ID
 PUT    /books/{id}         # Atualizar livro
 DELETE /books/{id}         # Deletar livro
+GET    /books/{id}/chapters # Listar capítulos de um livro
 ```
 
 #### Capítulos (Chapters)
 
 ```http
 POST   /chapters           # Criar capítulo
+GET    /chapters/{id}/verses # Listar versículos de um capítulo
 ```
 
 #### Versículos (Verses)
 
 ```http
 POST   /verses             # Criar versículo
+GET    /verses             # Listar todos os versículos
+GET    /verses?search=texto # Buscar versículos por texto
 ```
 
 ### Interface Administrativa
