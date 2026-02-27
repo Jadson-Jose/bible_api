@@ -301,3 +301,67 @@ def delete_verse_form(
         url=f"/admin/books/{book_id}/chapters/{chapter_id}/verses",
         status_code=303,
     )
+
+
+@app.get("/books", response_model=list[BookResponse])
+def list_books(db: Session = Depends(get_db)):
+    books = db.query(Book).all()
+    return books
+
+
+@app.get("/books/{book_id}", response_model=BookResponse)
+def get_book(book_id: int, db: Session = Depends(get_db)):
+    book = db.query(Book).filter(Book.id == book_id).first()
+
+    if not book:
+        raise HTTPException(status_code=404, detail="Livro não encontrado")
+    return book
+
+
+@app.get("/books/{book_id}/chapters", response_model=list[ChapterResponse])
+def list_chapters(book_id: int, db: Session = Depends(get_db)):
+    # Verifica se o livro existe
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Livro não encontrado")
+
+    # Busca capítulos do livro
+    chapters = (
+        db.query(Chapter)
+        .filter(Chapter.book_id == book_id)
+        .order_by(Chapter.number)
+        .all()
+    )
+
+    return chapters
+
+
+@app.get("/chapters/{chapter_id}/verses", response_model=list[Verseresponse])
+def list_verses(chapter_id: int, db: Session = Depends(get_db)):
+    # Verifica se o capítulo existe
+    chapter = db.query(Chapter).filter(Chapter.id == chapter_id).first()
+    if not chapter:
+        raise HTTPException(status_code=404, detail="Capítulo não encontrado")
+
+    # Busca versículos do capítulo
+    verses = (
+        db.query(Verse)
+        .filter(Verse.chapter_id == chapter_id)
+        .order_by(Verse.number)
+        .all()
+    )
+    return verses
+
+
+@app.get("/verses", response_model=list[Verseresponse])
+def search_verses(search: str, db: Session = Depends(get_db)):
+    query = db.query(Verse)
+
+    # Se tem parâmetro de busca, filtra pelo texto
+    if search:
+        query = query.filter(Verse.text.ilike(f"%{search}%"))
+
+    # Ordena por capítulo e número
+    verses = query.order_by(Verse.chapter_id, Verse.number).all()
+
+    return verses
