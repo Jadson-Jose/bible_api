@@ -412,8 +412,8 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso acadêmico.
 
 Para dúvidas ou sugestões sobre o projeto:
 
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
-- Email: seu-email@example.com
+- GitHub: https://github.com/Jadson-Jose
+- Email: jadsonjosesilva@gmail.com
 
 ---
 
