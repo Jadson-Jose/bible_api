@@ -308,7 +308,9 @@ def create_verse_form(
 
 
 # Rota para deletar versículo via formulário
-@app.post("/admin/books/{book_id}/chapters/{chapters_id}/verses/delete/{verse_id}")
+@app.post(
+    "/admin/books/{book_id}/chapters/{chapter_id}/verses/delete/{verse_id}"
+)  # ← SEM 'S'
 def delete_verse_form(
     book_id: int, chapter_id: int, verse_id: int, db: Session = Depends(get_db)
 ):
