@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -17,6 +18,16 @@ from app.schemas import (
 )
 
 app = FastAPI(title="Bible API", version="1.0.0")
+
+# Configuração de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Configuração de templates
 templates = Jinja2Templates(directory="app/templates")
@@ -72,6 +83,16 @@ def delete_book_form(book_id: int, db: Session = Depends(get_db)):
     book = db.query(Book).filter(Book.id == book_id).first()
 
     if book:
+        # Deletar todos os capítulos e versículos relacionados primeiro
+        chapters = db.query(Chapter).filter(Chapter.book_id == book_id).all()
+        for chapter in chapters:
+            # Deletar versículos do capítulo
+            db.query(Verse).filter(Verse.chapter_id == chapter.id).delete(
+                synchronize_session=False
+            )
+            # Deletar capítulo
+            db.delete(chapter)
+        # Deleta o livro
         db.delete(book)
         db.commit()
 
