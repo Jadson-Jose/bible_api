@@ -308,9 +308,7 @@ def create_verse_form(
 
 
 # Rota para deletar versículo via formulário
-@app.post(
-    "/admin/books/{book_id}/chapters/{chapter_id}/verses/delete/{verse_id}"
-)  # ← SEM 'S'
+@app.post("/admin/books/{book_id}/chapters/{chapter_id}/verses/delete/{verse_id}")
 def delete_verse_form(
     book_id: int, chapter_id: int, verse_id: int, db: Session = Depends(get_db)
 ):
@@ -388,3 +386,11 @@ def search_verses(search: str, db: Session = Depends(get_db)):
     verses = query.order_by(Verse.chapter_id, Verse.number).all()
 
     return verses
+
+
+@app.get("/chapters/{chapter_id}", response_model=ChapterResponse)
+def get_chapter(chapter_id: int, db: Session = Depends(get_db)):
+    chapter = db.query(Chapter).filter(Chapter.id == chapter_id).first()
+    if not chapter:
+        HTTPException(status_code=404, detail="Capítulo não encontrado")
+    return chapter
